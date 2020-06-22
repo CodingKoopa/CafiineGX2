@@ -1,0 +1,62 @@
+Starting launcher
+Gathering hook info from memory...
+Beginning Cafiine Function Hooking!
+Hooking function number 0: FSAInit...
+Hook instruction address: C20612F4 actual, 10612F4 original
+
+Hooking function number 1: FSAShutdown...
+Hook instruction address: C20613BC actual, 10613BC original
+
+Hooking function number 2: FSAAddClient...
+Hook instruction address: C2065EB4 actual, 1065EB4 original
+
+Hooking function number 3: FSADelClient...
+Hook instruction address: C20614EC actual, 10614EC original
+
+Hooking function number 4: FSAOpenFile...
+Hook instruction address: C2062C40 actual, 1062C40 original
+
+Hooking function number 5: FSInit...
+Hook instruction address: C2068E10 actual, 1068E10 original
+
+Hooking function number 6: FSShutdown...
+Hook instruction address: C2068F80 actual, 1068F80 original
+
+Hooking function number 7: FSAddClientEx...
+Hook instruction address: C2069044 actual, 1069044 original
+
+Hooking function number 8: FSDelClient...
+Hook instruction address: C2069450 actual, 1069450 original
+
+Hooking function number 9: FSOpenFile...
+Hook instruction address: C206F9C4 actual, 106F9C4 original
+
+Hooking function number 10: FSCloseFile...
+Hook instruction address: C206FAD0 actual, 106FAD0 original
+
+Hooking function number 11: FSReadFile...
+Hook instruction address: C206FB50 actual, 106FB50 original
+
+Hooking function number 12: FSReadFileWithPos...
+Hook instruction address: C206FBDC actual, 106FBDC original
+
+Hooking function number 13: FSGetPosFile...
+Hook instruction address: C206FF08 actual, 106FF08 original
+
+Hooking function number 14: FSSetPosFile...
+Hook instruction address: C206FF78 actual, 106FF78 original
+
+Hooking function number 15: FSGetStatFile...
+Hook instruction address: C206FFE8 actual, 106FFE8 original
+
+Hooking function number 16: FSIsEof...
+Hook instruction address: C2070058 actual, 1070058 original
+
+Initialize memory management
+Mount SD partition
+
+FSInit hook.
+FSAddClientEx hook.
+Found uninitialized client at number 0.
+Allocated new client number at slot 0.
+Connecting to Cafiine Server.

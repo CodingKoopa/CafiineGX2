@@ -77,9 +77,9 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
 
     HomebrewXML metaXml;
     bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
-        
-    std::string tabPath = (selectedButton->typee == RPX)? "games" : "apps";  
-                        
+
+    std::string tabPath = (selectedButton->typee == RPX)? "games" : "apps";
+
     // if GET or UDPATE, fetch xml from server
     if (selectedButton->status == GET || selectedButton->status == UPDATE)
     {
@@ -107,8 +107,8 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     iconImage.setPosition(80, yOffset - 30 - iconImage.getHeight() * 0.5f * scaleFactor);
     iconImage.setScale(scaleFactor);
     append(&iconImage);
-        
-    
+
+
 
     yOffset -= 50;
 
@@ -131,9 +131,9 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     descriptionText.setPosition(100, -370);
     descriptionText.setMaxWidth(width - 200, GuiText::WRAP);
     append(&descriptionText);
-        
+
     int actionButtonYOff = -30;
-        
+
     log_printf("Creating the button with click events");
 
     if (thisButton.status == GET)
@@ -152,7 +152,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         loadBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
         append(&loadBtn);
     }
-        
+
     if (thisButton.status == UPDATE)
     {
         scaleFactor = 1.0f;
@@ -168,7 +168,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         updateBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
         append(&updateBtn);
     }
-        
+
     if (thisButton.status == INSTALLED)
     {
         scaleFactor = 1.0f;
@@ -184,7 +184,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         reinstallBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
         append(&reinstallBtn);
     }
-        
+
     if (thisButton.status != GET)
     {
 		scaleFactor = 1.0f;
@@ -254,7 +254,7 @@ void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::stri
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
     std::string removePath = selectedButton->dirPath;
-    
+
     // if the remove path is the whole directory, stop!
     if (!removePath.compare(std::string("sd:/wiiu/apps")) || !removePath.compare(std::string("sd:/wiiu/apps/")) ||
        !removePath.compare(std::string("sd:/wiiu/games")) || !removePath.compare(std::string("sd:/wiiu/games/")))
@@ -265,84 +265,13 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
         DirList dirList(removePath, 0, DirList::Files | DirList::CheckSubfolders);
         for (int x=0; x<dirList.GetFilecount(); x++)
             remove(dirList.GetFilepath(x));
-        
+
         // now remove the directory
         rmdir(removePath.c_str());
     }
-    
+
     // close the window
     OnBackButtonClick(button, controller, trigger);
-    
-    // refresh main directory (crashes at the moment)
-    globalRefreshHomebrewApps();
-
-}
-
-/**
-This method is invoked after green is pressed, and is in a separate thread
-so that the animation of the progress bar can be controlled.
-
-The main issue with tis function is it needs some variables passed in order
-to fetch them. Currently this is done by attaching variables to the singleton
-instance of HomebrewWindow, which was set up at start.
-**/
-static void asyncDownloadTargetedFiles(CThread* thread, void* args)
-{
-    log_printf("asyncDownloadTargetedFiles: start");
-
-    // Set the progress bar to 0%
-    ProgressWindow * progress = getProgressWindow(); 
-    progress->setProgress(0);
-    
-    // get the homebrew window, which holds variables we need access to
-    HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
-    
-    // convert the repo url into a std::string
-    std::string mRepoUrl = std::string(repoUrl);
-    
-    // three previously stored variables that are used belong to know which files to download
-    std::string sdPathTarget = homebrewWindowTarget->sdPathTarget;
-    std::string binaryTarget = homebrewWindowTarget->binaryTarget;
-    std::string pathTarget = homebrewWindowTarget->pathTarget;
-    
-    std::string iconPath = "/icon.png";
-    std::string codePath = "/" + binaryTarget;
-    
-    if (homebrewWindowTarget->listingMode == RPX) // also kinda hacky, the current window doesn't have much to do with the current tab (listingMode)
-    {
-        // this is only needed for the icon and rpx download for rpx apps
-        iconPath = "/meta/iconTex.tga";
-        codePath = "/code" + codePath;
-    }
-    
-    log_printf("asyncDownloadTargetedFiles: variables: repoUrl: %s, sdPath: %s, binary: %s, path: %s, icon: %s, code: %s", mRepoUrl.c_str(), sdPathTarget.c_str(), binaryTarget.c_str(), pathTarget.c_str(), iconPath.c_str(), codePath.c_str());
-    
-    // download the elf to sd card, and update the progres bar description
-    progress->setTitle("Downloading " + sdPathTarget+codePath + "...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+codePath, sdPathTarget+codePath, &updateProgress);
-    log_printf("asyncDownloadTargetedFiles: downloaded %s", binaryTarget.c_str());
-    
-    // download meta.xml to sd card, and update the progres bar description
-    progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
-log_printf("asyncDownloadTargetedFiles: downloaded meta.xml");
-    
-    // download the app image icon for this app. (If the icon download is interrupted,
-    // HBL may crash when it tries to read it
-    log_printf("Gonna get %s and put it in %s", (mRepoUrl+pathTarget+iconPath).c_str(), (sdPathTarget+iconPath).c_str());
-    progress->setTitle("Downloading " + sdPathTarget+iconPath+"...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+iconPath, sdPathTarget+iconPath, &updateProgress);
-    log_printf("asyncDownloadTargetedFiles: downloaded the icon");
-    
-    // remove the progress bar
-    homebrewWindowTarget->removeE(progress);
-    
-    // really hacky way to dismiss this window
-    homebrewWindowTarget->OnLaunchBoxCloseClick(homebrewWindowTarget->launchWindowTarget);
-
-    // refresh main directory (crashes at the moment)
-    globalRefreshHomebrewApps();
-    log_printf("asyncDownloadTargetedFiles: stop");
 }
 
 /**
@@ -358,26 +287,26 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     backBtn.setState(GuiElement::STATE_DISABLED);
     updateBtn.setState(GuiElement::STATE_DISABLED);
     reinstallBtn.setState(GuiElement::STATE_DISABLED);
-    
+
     // find the path on the server depending on our current tab
     std::string tabPath = (selectedButton->typee == RPX)? "games" : "apps";
 
     // setup the paths based on the selected button
     std::string path = "/"+tabPath+"/"+selectedButton->shortname;
     std::string sdPath = ReplaceAll2("sd:/wiiu"+path, "%20", " ");
-        
+
     // create a new directory on sd
     CreateSubfolder(sdPath.c_str());
-    
+
     // if it's an rpx file, there are two more directories to make: meta and code
     if (selectedButton->typee == RPX)
     {
         CreateSubfolder((sdPath+"/code").c_str());
         CreateSubfolder((sdPath+"/meta").c_str());
     }
-    
+
     // get progress window and homebrew window, add progress to view
-    ProgressWindow * progress = getProgressWindow(); 
+    ProgressWindow * progress = getProgressWindow();
     HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
     homebrewWindowTarget->append(progress);
 
@@ -386,16 +315,12 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     homebrewWindowTarget->sdPathTarget = sdPath;
     homebrewWindowTarget->pathTarget = path;
     homebrewWindowTarget->binaryTarget = selectedButton->binary;
-    
+
     // targets to store to dismiss the window later
 //    homebrewWindowTarget->controllerTarget = controller;
 //    homebrewWindowTarget->buttonTarget = button;
 //    homebrewWindowTarget->triggerTarget = trigger;
     homebrewWindowTarget->launchWindowTarget = this;
-    
+
     log_printf("OnLoadButtonClick: starting downloading thread");
-    // Create a new thread to do the downloading it, so the prgress bar can be updated
-    CThread * pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore0 | CThread::eAttributePinnedAff, 10);
-    pThread->resumeThread();
-    
 }

@@ -29,9 +29,6 @@ extern int movedALittleBit;
 extern int scrolledSoFar;
 
 extern void scrollMenu(float scrol);
-extern void asyncRefreshHomebrewAppIcons(CThread* thread, void* args);
-extern void asyncRefreshHomebrewApps(CThread* thread, void* args);
-extern void globalRefreshHomebrewApps();
 
 class MainWindow : public sigslot::has_slots<>
 {
@@ -41,15 +38,10 @@ public:
     int width, height;
 
     GuiImage bgImageColor;
-    
-    bool showingSplashScreen;
-    bool disableSplashScreenNextUpdate;
-    GuiImageData * backgroundImg2Data;
+
+    GuiImageData* backgroundImg2Data;
     GuiImage backgroundImg2;
-        
-    GuiImageData * splashScreenImgData;
-    GuiImage splashScreen;
-    
+
     CThread * initialLoadThread;
 
     void appendTv(GuiElement *e)

@@ -28,7 +28,7 @@ export OBJCOPY	:=	$(PREFIX)objcopy
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET		:=	hbas
+TARGET		:=	CafiineGX2
 BUILD		:=	build
 BUILD_DBG	:=	$(TARGET)_dbg
 SOURCES		:=	src \
@@ -61,9 +61,9 @@ INCLUDES	:=  src
 # options for code generation
 #---------------------------------------------------------------------------------
 CFLAGS	:=  -std=gnu11 -mrvl -mcpu=750 -meabi -mhard-float -ffast-math \
-		    -O3  -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing $(INCLUDE)
+		    -O3 -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing $(INCLUDE)
 CXXFLAGS := -std=gnu++11 -mrvl -mcpu=750 -meabi -mhard-float -ffast-math \
-		    -O3  -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing $(INCLUDE)
+		    -O3 -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing $(INCLUDE)
 ASFLAGS	:= -mregnames
 LDFLAGS	:= -nostartfiles -Wl,-Map,$(notdir $@).map,-wrap,malloc,-wrap,free,-wrap,memalign,-wrap,calloc,-wrap,realloc,-wrap,malloc_usable_size,-wrap,_malloc_r,-wrap,_free_r,-wrap,_realloc_r,-wrap,_calloc_r,-wrap,_memalign_r,-wrap,_malloc_usable_size_r,-wrap,valloc,-wrap,_valloc_r,-wrap,_pvalloc_r,--gc-sections
 
@@ -82,7 +82,7 @@ LIBS	:= -lgcc -lgd -lpng -lz -lfreetype -lmad -lvorbisidec
 LIBDIRS	:=	$(CURDIR)	\
 			$(DEVKITPPC)/lib  \
 			$(DEVKITPPC)/lib/gcc/powerpc-eabi/4.8.2
-            
+
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
 # rules for different file extensions
@@ -135,17 +135,22 @@ export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
 					-L$(LIBOGC_LIB) -L$(PORTLIBS)/lib
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
-.PHONY: $(BUILD) clean install
+.PHONY: $(BUILD) all clean wiiload
 
-#---------------------------------------------------------------------------------
 $(BUILD):
+	@echo "... build ..."
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@python wiiload.py CafiineGX2.elf
 
-#---------------------------------------------------------------------------------
 clean:
-	@echo clean ...
+	@echo "... clean ..."
 	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).bin $(BUILD_DBG).elf
+
+s: $(BUILD)
+	@echo "... wiiload ..."
+	@python wiiload.py CafiineGX2.elf
+	@echo "Sideloading Complete!"
 
 #---------------------------------------------------------------------------------
 else

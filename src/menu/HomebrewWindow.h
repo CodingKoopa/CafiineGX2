@@ -64,10 +64,10 @@ public:
     float lastScrollOffY = 0;
     // all homebrew buttons
     std::vector<homebrewButton> homebrewButtons;
-    
+
     std::vector<homebrewButton> localAppButtons;    // will be refreshed a lot
     std::vector<homebrewButton> remoteAppButtons;   // will refreshed once
-    
+
     // separate vectors for the current tab (some combo off local and remote)
     std::vector<homebrewButton> curTabButtons;
 
@@ -93,45 +93,42 @@ public:
     std::string binaryTarget;
     std::string pathTarget;
     std::string sdPathTarget;
-    
+
     void OnLaunchBoxCloseClick(GuiElement *element);
-    
+
     // this is wrong, should pass args instead of doing this
 //    GuiButton *buttonTarget;
 //    const GuiController *controllerTarget;
 //    GuiTrigger *triggerTarget;
     GuiFrame * launchWindowTarget;
     std::string bufString;
-    
+
 private:
     void OnOpenEffectFinish(GuiElement *element);
     void OnCloseEffectFinish(GuiElement *element);
     void OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
-	
-	void OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+
+	void OnInstallCafButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
 	void OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
 
 
     void OnCloseTcpReceiverFinish(GuiElement *element);
     void OnTcpReceiveStart(GuiElement *element, u32 ip);
     void OnTcpReceiveFinish(GuiElement *element, u32 ip, int result);
-    
-
-    GuiSound *buttonClickSound;
-    GuiImageData * installedButtonImgData;
-    GuiImageData * getButtonImgData;
-    GuiImageData * updateButtonImgData;
-    GuiImageData * localButtonImgData;
 
     GuiText hblVersionText;
-    GuiText * hblRepoText;
-	
-	GuiImageData *hblTabImgData;
-    GuiImageData *rpxTabImgData;
-	GuiImage hblTabImg;
-    GuiImage rpxTabImg;
-	GuiButton hblTabBtn;
-    GuiButton rpxTabBtn;
+
+    GuiText installCafText;
+    GuiImageData* installCafImgData;
+    GuiImage installCafImg;
+    GuiButton installCafButton;
+
+	// GuiImageData *hblTabImgData;
+  //   GuiImageData *rpxTabImgData;
+	// GuiImage hblTabImg;
+  //   GuiImage rpxTabImg;
+	// GuiButton hblTabBtn;
+  //   GuiButton rpxTabBtn;
 
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;

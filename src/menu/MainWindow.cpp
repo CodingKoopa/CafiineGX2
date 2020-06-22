@@ -36,23 +36,18 @@ MainWindow::MainWindow(int w, int h)
     , bgImageColor(w, h, (GX2Color){ 0, 0, 0, 0 })
     , backgroundImg2Data(Resources::GetImageData("bg.png"))
     , backgroundImg2(backgroundImg2Data)
-    , splashScreenImgData(Resources::GetImageData("splash.png"))
-    , splashScreen(splashScreenImgData)
 {
 //    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 0);
 //    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 1);
 //    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 2);
 //    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 3);
 //    append(&bgImageColor);
-        
+
     append(&backgroundImg2);
-        
-    disableSplashScreenNextUpdate = false;
+
+
 //    splashScreenImgData = new GuiImageData(Resources::GetImageData("splash.png");
 //    splashScreen = new GuiImage(splashScreenImgData);
-                        
-    append(&splashScreen);
-    showingSplashScreen = true;
 
     for(int i = 0; i < 4; i++)
     {
@@ -62,44 +57,17 @@ MainWindow::MainWindow(int w, int h)
         pointerImg[i]->setScale(1.5f);
         pointerValid[i] = false;
     }
-        
+
     homebrewWindow = new HomebrewWindow(w, h);
-        
+    append(homebrewWindow);
+
     log_printf("MainWindow done loading");
-    CThread * pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
-    pThread->resumeThread();
 }
-
-void asyncRefreshHomebrewAppIcons(CThread* thread, void* args)
-{
-    log_printf("NEW THREAD START: Icon async refresh");
-    homebrewWindow->populateIconCache();
-    log_printf("EXISTING THREAD END: Icon async refresh");
-}
-
-void asyncRefreshHomebrewApps(CThread* thread, void* args)
-{
-    log_printf("NEW THREAD START: Async refresh homebrew apps");
-    homebrewWindow->refreshHomebrewApps();
-    // when refresh is done, start preloading the icon cache
-    CThread * pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
-    pThread->resumeThread();
-    log_printf("EXISTING THREAD END: Async refresh homebrew apps");
-}
-
-void globalRefreshHomebrewApps()
-{
-    homebrewWindow->refreshHomebrewApps();
-}
-
-
 
 MainWindow::~MainWindow()
 {
     removeE(homebrewWindow);
 //    removeE(&bgImageColor);
-    if (showingSplashScreen)
-        removeE(&splashScreen);
 
 //    while(!tvElements.empty())
 //    {
@@ -147,61 +115,41 @@ void MainWindow::updateEffects()
 
 void MainWindow::update(GuiController *controller)
 {
-    //! dont read behind the initial elements in case one was added
-    //u32 tvSize = tvElements.size();
-    
-        if(controller->chanIdx >= 1 && controller->chanIdx <= 4 && controller->data.validPointer)
-    {
-        int wpadIdx = controller->chanIdx - 1;
-        f32 posX = controller->data.x;
-        f32 posY = controller->data.y;
-        pointerImg[wpadIdx]->setPosition(posX, posY);
-        pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
-        pointerValid[wpadIdx] = true;
-    }
-    
-    if (showingSplashScreen && controller->data.touched)
-        disableSplashScreenNextUpdate = true;
-    
-    else if ((disableSplashScreenNextUpdate ||
-        (controller->data.buttons_h & VPAD_BUTTON_A)) &&
-        showingSplashScreen)
-    {
-        removeE(&splashScreen);
-        showingSplashScreen = false;
-        append(homebrewWindow);
+  //! dont read behind the initial elements in case one was added
+  //u32 tvSize = tvElements.size();
 
-        // perform a synchronous refresh
-//        globalRefreshHomebrewApps();
-        
-        log_printf("update made");
-        
+  if (controller->chanIdx >= 1 && controller->chanIdx <= 4 && controller->data.validPointer)
+  {
+      int wpadIdx = controller->chanIdx - 1;
+      f32 posX = controller->data.x;
+      f32 posY = controller->data.y;
+      pointerImg[wpadIdx]->setPosition(posX, posY);
+      pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
+      pointerValid[wpadIdx] = true;
+  }
 
-        return;
-    }
-    
-    // below code from Space Game https://github.com/vgmoose/space/blob/hbl_elf/src/space.c
-    		
+  // below code from Space Game https://github.com/vgmoose/space/blob/hbl_elf/src/space.c
+
 	// Handle analog stick movements
 	Vec2D left =  controller->data.lstick;
 	Vec2D right = controller->data.rstick;
 
 	// get the differences
 	float ydif = -20*left.y + -20*right.y;
-        
+
 	// Handle D-pad movements as well
 	ydif = (ydif >  1 || controller->data.buttons_h &	VPAD_BUTTON_DOWN)?    20 : ydif;
 	ydif = (ydif < -1 || controller->data.buttons_h &  VPAD_BUTTON_UP)? -20: ydif;
-    
+
 //    // do auto scrolling on first load to the top
 //    if (!showingSplashScreen && doIntroScroll)
 //        ydif -= 20;
-    
+
     if (ydif != 0) {
         movedALittleBit = 10;
         scrollMenu(ydif);
     }
-    
+
     if (controller->data.touched) {
         if (lastTouchX2 == -1)
         {
@@ -263,7 +211,7 @@ void scrollMenu(float scrol)
     {
         return;
     }
-    
+
     movedALittleBit = 10; // we scrolled
 
     homebrewWindow->lastScrollOffY = homebrewWindow->scrollOffY;

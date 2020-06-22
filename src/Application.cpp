@@ -34,22 +34,28 @@ Application::Application()
     , mainWindow(NULL)
     , exitCode(EXIT_RELAUNCH_ON_LOAD)
 {
+	log_printf("test\n");
     controller[0] = new VPadController(GuiTrigger::CHANNEL_1);
     controller[1] = new WPadController(GuiTrigger::CHANNEL_2);
     controller[2] = new WPadController(GuiTrigger::CHANNEL_3);
     controller[3] = new WPadController(GuiTrigger::CHANNEL_4);
     controller[4] = new WPadController(GuiTrigger::CHANNEL_5);
-        
+		log_printf("Loading resources\n");
+
     //! load resources
     Resources::LoadFiles("sd:/wiiu/apps/appstore/resources");
+		log_printf("Resources::LoadFiles\n");
 
+		log_printf("getting file from resources\n");
     //! create bgMusic
     bgMusic = new GuiSound(Resources::GetFile("screampics.mp3"), Resources::GetFileSize("screampics.mp3"));
+		log_printf("gotten\n");
     bgMusic->SetLoop(true);
     bgMusic->Play();
     bgMusic->SetVolume(50);
 
 	exitApplication = false;
+	log_printf("ready\n");
 }
 
 Application::~Application()
@@ -142,7 +148,7 @@ void Application::executeThread(void)
     log_printf("Initialize main font system\n");
     FreeTypeGX *fontSystem = new FreeTypeGX(Resources::GetFile("font.ttf"), Resources::GetFileSize("font.ttf"), true);
     GuiText::setPresetFont(fontSystem);
-    GuiText::setPresets(28, glm::vec4(0, 0, 0, 1), 0xFFFF, ALIGN_CENTER | ALIGN_MIDDLE); 
+    GuiText::setPresets(28, glm::vec4(0, 0, 0, 1), 0xFFFF, ALIGN_CENTER | ALIGN_MIDDLE);
 
     log_printf("Initialize main window\n");
 
@@ -153,6 +159,7 @@ void Application::executeThread(void)
     //! main GX2 loop (60 Hz cycle with max priority on core 1)
 	while(!exitApplication)
 	{
+		log_printf("spam\n");
 	    //! Read out inputs
 	    for(int i = 0; i < 5; i++)
         {
