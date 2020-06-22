@@ -10,6 +10,8 @@
 #include "dynamic_libs/ax_functions.h"
 #include "fs/fs_utils.h"
 #include "fs/sd_fat_devoptab.h"
+#include "kernel/kernel_functions.h"
+#include "patcher/function_hooks.h"
 #include "system/memory.h"
 #include "utils/logger.h"
 #include "utils/utils.h"
@@ -27,7 +29,7 @@ extern "C" int Menu_Main(void)
     InitOSFunctionPointers();
     InitSocketFunctionPointers();
 
-    log_init("192.168.1.104");
+    log_init("192.168.1.195");
     log_print("Starting launcher\n");
 
     InitFSFunctionPointers();
@@ -39,7 +41,9 @@ extern "C" int Menu_Main(void)
     InitCurlFunctionPointers();
     InstallExceptionHandler();
 
-    log_print("Function exports loaded\n");
+    SetupKernelCallback();
+    PatchMethodHooks();
+
 
     //!*******************************************************************
     //!                    Initialize heap memory                        *
@@ -64,10 +68,10 @@ extern "C" int Menu_Main(void)
 
     log_printf("Unmount SD\n");
     unmount_sd_fat("sd");
-    log_printf("Release memory\n");
-    memoryRelease();
     log_deinit();
+    memoryRelease();
 
-    return 0;
+    SYSLaunchMenu();
+
+    return EXIT_RELAUNCH_ON_LOAD;
 }
-

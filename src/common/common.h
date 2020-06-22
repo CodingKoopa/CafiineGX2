@@ -13,6 +13,12 @@ extern "C" {
 #define SD_PATH                     "sd:"
 #define WIIU_PATH                   "/wiiu"
 
+/* Macros for libs */
+#define LIB_CORE_INIT           0
+#define LIB_NSYSNET             1
+#define LIB_GX2                 2
+
+// Start of MEM0 chip
 #ifndef MEM_BASE
 #define MEM_BASE                    (0x00800000)
 #endif
@@ -29,9 +35,20 @@ extern "C" {
 #endif
 #define EXIT_RELAUNCH_ON_LOAD       0xFFFFFFFD
 
+#define RESTORE_INSTR_MAGIC         0xC001C0DE
+#define RESTORE_INSTR_ADDR          ((restore_instructions_t*)(MEM_BASE + 0x1600))
+
+typedef struct _restore_instructions_t {
+    unsigned int magic;
+    unsigned int instr_count;
+    struct {
+        unsigned int addr;
+        unsigned int instr;
+    } data[0];
+} restore_instructions_t;
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif	/* COMMON_H */
-
