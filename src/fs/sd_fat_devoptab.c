@@ -32,6 +32,7 @@
 #include "dynamic_libs/fs_functions.h"
 #include "dynamic_libs/os_functions.h"
 #include "fs_utils.h"
+#include "utils/logger.h"
 
 #define FS_ALIGNMENT            0x40
 #define FS_ALIGN(x)             (((x) + FS_ALIGNMENT - 1) & ~(FS_ALIGNMENT - 1))
@@ -928,6 +929,7 @@ static int sd_fat_add_device (const char *name, const char *mount_path, void *pC
 
 static int sd_fat_remove_device (const char *path, void **pClient, void **pCmd, char **mountPath)
 {
+  log_printf("removing device.");
     const devoptab_t *devoptab = NULL;
     char name[128] = {0};
     int i;

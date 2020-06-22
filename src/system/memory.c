@@ -19,6 +19,7 @@
 #include "dynamic_libs/os_functions.h"
 #include "common/common.h"
 #include "memory.h"
+#include "utils/logger.h"
 
 #define MEMORY_ARENA_1          0
 #define MEMORY_ARENA_2          1
@@ -67,10 +68,12 @@ void memoryInitialize(void)
 
 void memoryRelease(void)
 {
+    log_printf("Destroying MEM1 heap \n");
     MEMDestroyExpHeap(mem1_heap);
     MEMFreeToFrmHeap(MEMGetBaseHeapHandle(MEMORY_ARENA_1), 3);
     mem1_heap = -1;
 
+    log_printf("Destroying bucket heap \n");
     MEMDestroyExpHeap(bucket_heap);
     MEMFreeToFrmHeap(MEMGetBaseHeapHandle(MEMORY_ARENA_FG_BUCKET), 3);
     bucket_heap = -1;
